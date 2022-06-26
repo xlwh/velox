@@ -28,6 +28,9 @@ namespace facebook::velox {
 // of positions is more convenient. folly::Range is also faster to
 // pass and access than the indirections and smart pointers that may
 // be involved in SelectivityVector.
+// 一组唯一的、递增的行号，用作限定集。 这在逻辑上可以与 SelectivityVector 互换。
+// 由于列读取没有频繁的位操作，但总是在经常稀疏的位置上循环，因此位置数组更方便。
+// folly::Range 的传递和访问也比 SelectivityVector 中可能涉及的间接和智能指针更快。
 using RowSet = folly::Range<const vector_size_t*>;
 
 // Defines a per-value callback to apply to values when loading a
@@ -110,7 +113,7 @@ class BaseRuntimeStatWriter {
       const RuntimeCounter& /* value */) {}
 };
 
-// Setting a concrete runtime stats writer on the thread will ensure that lazy
+// Setting a concrete runtime stats' writer on the thread will ensure that lazy
 // vectors will add time spent on loading data using that writer.
 void setRunTimeStatWriter(std::unique_ptr<BaseRuntimeStatWriter>&& ptr);
 

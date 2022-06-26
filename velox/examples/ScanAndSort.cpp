@@ -38,13 +38,16 @@ using namespace facebook::velox;
 int main(int argc, char** argv) {
   // Velox Tasks/Operators are based on folly's async framework, so we need to
   // make sure we initialize it first.
+  // 初始化一个异步框架，后面的operator需要使用
   folly::init(&argc, &argv);
 
   // Default memory allocator used throughout this example.
+  // 拿到全局的内存池
   auto pool = memory::getDefaultScopedMemoryPool();
 
-  // For this example, the input dataset will be comprised of a single BIGINT
+  // For this example, the input dataset will be composed of a single BIGINT
   // column ("my_col"), containing 10 rows.
+  // 创建一个单列，数据类型为int, 放10行数据
   auto inputRowType = ROW({{"my_col", BIGINT()}});
   const size_t vectorSize = 10;
 
@@ -53,12 +56,15 @@ int main(int argc, char** argv) {
   auto vector = BaseVector::create(BIGINT(), vectorSize, pool.get());
   auto rawValues = vector->values()->asMutable<int64_t>();
 
+  // 写入0 - 10
   std::iota(rawValues, rawValues + vectorSize, 0); // 0, 1, 2, 3, ...
   std::random_device rd;
   std::mt19937 g(rd());
   std::shuffle(rawValues, rawValues + vectorSize, g);
 
   // Wrap the vector (column) in a RowVector.
+  // rowVector表示的是多行多列的数据，在内存中计算一般是以rowVector为单位来进行计算
+  // 但是在这个例子中，其实只有一列10行数据
   auto rowVector = std::make_shared<RowVector>(
       pool.get(), // pool where allocations will be made.
       inputRowType, // input row type (defined above).
@@ -75,6 +81,7 @@ int main(int argc, char** argv) {
   // Create a temporary dir to store the local file created. Note that this
   // directory is automatically removed when the `tempDir` object runs out of
   // scope.
+  // 创建一个临时目录，用来放Hive数据
   auto tempDir = exec::test::TempDirectoryPath::create();
   const std::string filePath = tempDir->path + "/file1.dwrf";
   LOG(INFO) << "Writing dwrf file to '" << filePath << "'.";
@@ -88,6 +95,7 @@ int main(int argc, char** argv) {
 
   // Create a new connector instance from the connector factory and register
   // it:
+  // 注册一个HiveConnector，用来读写数据
   auto hiveConnector =
       connector::getConnectorFactory(
           connector::hive::HiveConnectorFactory::kHiveConnectorName)
@@ -101,7 +109,7 @@ int main(int argc, char** argv) {
 
   // Once we finalize setting up the Hive connector, let's define our query
   // plan. We use the helper `PlanBuilder` class to generate the query plan
-  // for this example, but this is usually done programatically based on the
+  // for this example, but this is usually done programmatically based on the
   // application's IR. Considering that the plan executed in a local host is
   // usually part of a larger and often distributed query, this local portion is
   // called a "query fragment" and described by a "plan fragment".

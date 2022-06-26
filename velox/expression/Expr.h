@@ -362,8 +362,9 @@ using ExprPtr = std::shared_ptr<Expr>;
 
 // A set of Exprs that get evaluated together. Common subexpressions
 // can be deduplicated. This is the top level handle on an expression
-// and is used also if only one Expr is to be evaluated. TODO: Rename to
-// ExprList.
+// and is used also if only one Expr is to be evaluated.
+//
+// TODO: Rename to ExprList.
 class ExprSet {
  public:
   explicit ExprSet(

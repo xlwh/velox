@@ -76,9 +76,12 @@ class VeloxIn10MinDemo : public VectorTestBase {
   VectorPtr evaluate(exec::ExprSet& exprSet, const RowVectorPtr& input) {
     exec::EvalCtx context(execCtx_.get(), &exprSet, input.get());
 
+    // select vector
     SelectivityVector rows(input->size());
+    // 存放结果，计算后只有一列
     std::vector<VectorPtr> result(1);
     exprSet.eval(rows, &context, &result);
+    // 返回结果列
     return result[0];
   }
 
@@ -282,7 +285,6 @@ void VeloxIn10MinDemo::run() {
 
 int main(int argc, char** argv) {
   folly::init(&argc, &argv, false);
-
   VeloxIn10MinDemo demo;
   demo.run();
 }

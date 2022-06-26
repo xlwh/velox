@@ -2113,3 +2113,15 @@ TEST_F(TableScanTest, errorInLoadLazy) {
     EXPECT_TRUE(ex.context().find(filePath->path, 0) != std::string::npos);
   }
 }
+
+TEST_F(TableScanTest, MyTest) {
+  auto a = makeFlatVector<int64_t>({0, 1, 2, 3, 4, 5, 6});
+  auto b = makeFlatVector<int64_t>({0, 1, 2, 3, 4, 5, 6});
+  auto c = makeFlatVector<std::string>({"a", "b", "c", "d", "e", "f", "g"});
+  auto data = makeRowVector({"a", "b", "c"}, {a, b, c});
+  std::cout << "Data: " << data->toString() << std::endl;
+  for (int idx = 0; idx < data->size(); ++idx) {
+    std::cout << data->toString(idx) << std::endl;
+  }
+  EXPECT_EQ(1, 2);
+}

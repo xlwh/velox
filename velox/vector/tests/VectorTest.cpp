@@ -34,10 +34,15 @@ using facebook::velox::ComplexType;
 
 // LazyVector loader for testing. Minimal implementation that documents the API
 // contract.
+// 列数据的懒加载？？
 class TestingLoader : public VectorLoader {
  public:
+  // 构造的时候，传入一列数据的指针
   explicit TestingLoader(VectorPtr data) : data_(data) {}
 
+  // 为 'rows' 生成惰性值，如果 'hook' 不是 nullptr，则在每个上调用 hook。
+  // 如果 'hook' 为 nullptr，则将 '*result' 设置为包含 'rows' 值的向量。
+  // 'rows' 必须是在创建加载器时可加载的行的子集。 这可能在“this”的生命周期中被调用一次。
   void loadInternal(RowSet rows, ValueHook* hook, VectorPtr* result) override {
     if (hook) {
       VELOX_DYNAMIC_SCALAR_TYPE_DISPATCH(
